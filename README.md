@@ -12,8 +12,8 @@
         - [全局函数UNICODE](#全局函数unicode)
         - [比较运算符](#比较运算符)
         - [返回列表的字典类方法](#返回列表的字典类方法)
-        - [map-filter-reduce](#map-filter-reduce)
-        - [TRY-EXCEPT](#try-except)
+        - [map-filter-reduce](#mapfilterreduce)
+        - [TRY-EXCEPT](#tryexcept)
         - [XRANGE](#xrange)
         - [INPUT](#input)
         - [函数属性FUNC](#函数属性func)
@@ -23,10 +23,10 @@
         - [TYPES模块中的常量](#types模块中的常量)
         - [对元组的列表解析](#对元组的列表解析)
         - [元类](#元类)
-        - [在python2中使用future模块](#在python2中使用future模块)
-        - [functools](#functools)
-        - [INPUT](#input)
-        - [INPUT](#input)
+        - [在python2中使用__future__模块](#在python2中使用__future__模块)
+        - [整除divide](#整除divide)
+        - [next()](#next)
+        - [For循环变量和全局命名空间泄漏](#for循环变量和全局命名空间泄漏)
         - [INPUT](#input)
 - [包差异](#包差异)
     - [pylint](#pylint)
@@ -149,6 +149,7 @@ unicode()把对象转换成unicode字符串 <br> str()把对象转换为非Unico
 python2 | python3 | 备注 |
 :--- | :--- | :--- |
 <> or != |   != |
+[1, 2] > ‘foo’ = False <br/> (1, 2) > ‘foo’ = True <br/> [1, 2] > (1, 2) = False | TypeError: unorderable types: list() > str() |Python 3 中当对不可排序类型做比较的时候，会抛出一个类型错误
 
 
 ### 返回列表的字典类方法
@@ -272,7 +273,7 @@ types.DictType |		dict
 types.IntType |		int
 types.LongType |		int
 types.ListType |		list
-types.NoneType |		type(None
+types.NoneType |		type(None)
 types.BooleanType |		bool
 types.BufferType |		memoryview
 types.ClassType	 |	type
@@ -308,7 +309,7 @@ class Whip: __metaclass__ = PapayMeta	 | class Whip(metaclass=PapayaMeta): pass
 class C(Whipper, Beater): __metaclass__ = PapayaMeta | 	class C(Whipper, Beater, metaclass=PapayMeta): pass
 
 
-### 在python2中使用future模块
+### 在python2中使用__future__模块
 ```
 all_feature_names = [
     "nested_scopes",
@@ -330,30 +331,45 @@ from future import division | 3 / 4 = 0 | 3 / 4 = 0.75; 3//4 = 0 |
 from future import print_function | 不支持print a | print(a)
 from __future__ import unicode_literals | print '\'xxx\' is unicode?', isinstance('xxx', unicode) >> False | print '\'xxx\' is unicode?', isinstance('xxx', unicode) >> True
 
+### 整除divide
+
+**如果你正在移植代码，这个变化是特别危险的。或者你在 Python 2 上执行 Python 3 的代码。因为这个整除的变化表现在它会被忽视（即它不会抛出语法异常）。
+　　因此，我还是倾向于使用一个 float(3)/2 或 3/2.0 代替在我的 Python 3 脚本保存在 Python 2 中的 3/2 的一些麻烦（并且反而过来也一样，我建议在你的 Python 2 脚本中使用 from __future__ import division）**
+
+module | python2 | python3 | 备注 |
+:--- |:--- | :--- | :--- |
+3 / 2 | 1 |  1.5
+3 // 2  | 1 | 1
+3 / 2.0 | 1.5 |1.5
+3 // 2.0| 1.0 | 1.0
 
 
-### functools
+### next()
+
+```
+my_generator = (letter for letter in 'abcdefg')
+```
 
 python2 | python3 | 备注 |
 :--- | :--- | :--- |
+next(my_generator) <br/> my_generator.next()  | next(my_generator) | Python 3 移除了方法.next()
 
 
+### For循环变量和全局命名空间泄漏
 
-
-### INPUT
+好消息：在 Python 3.x 中 for 循环变量不会再导致命名空间泄漏。
+　　在 Python 3.x 中做了一个改变，在 What’s New In Python 3.0 中有如下描述：
+　　“列表推导不再支持 [... for var in item1, item2, ...] 这样的语法。使用 [... for var in (item1, item2, ...)] 代替。也需要提醒的是列表推导有不同的语义： 他们关闭了在 list() 构造器中的生成器表达式的语法糖, 并且特别是循环控制变量不再泄漏进周围的作用范围域.”
+```
+i = 1
+print 'before: i =', i
+print 'comprehension: ', [i for i in range(5)]
+print 'after: i =', i
+```
 
 python2 | python3 | 备注 |
 :--- | :--- | :--- |
-
-
-
-
-### INPUT
-
-python2 | python3 | 备注 |
-:--- | :--- | :--- |
-
-
+before: i = 1 <br/> comprehension: [0, 1, 2, 3, 4] <br/> after: i = 4<br/> | before: i = 1 <br/>comprehension: [0, 1, 2, 3, 4] <br/>after: i = 1|
 
 
 ### INPUT
